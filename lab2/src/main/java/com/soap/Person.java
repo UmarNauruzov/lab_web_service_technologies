@@ -1,0 +1,65 @@
+package com.soap;
+
+public class Person {
+    private int person_id;
+    private String name;
+    private String patronymic;
+    private String surname;
+    private int age;
+    private String gender;
+
+    public Person(int id, String name, String patronymic, String surname, int age, String gender) {
+        this.person_id = id;
+        this.name = name;
+        this.patronymic = patronymic;
+        this.surname = surname;
+        this.age = age;
+        this.gender = gender;
+    }
+
+    public int getPerson_id() {
+        return person_id;
+    }
+
+    public String getName() {
+        return name;
+    }
+    public String getPatronymic() {
+        return patronymic;
+    }
+    public String getSurname() {
+        return surname;
+    }
+    public int getAge() {
+        return age;
+    }
+    public String getGender() {
+        return gender;
+    }
+
+    public void setPerson_id(int person_id) {
+        this.person_id = person_id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+    public void setPatronymic(String patronymic) {
+        this.surname = patronymic;
+    }
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+    public void setAge(int age) {
+        this.age = age;
+    }
+    public void setGender(String gender) {
+        this.surname = gender;
+    }
+
+    @Override
+    public String toString() {
+        return "Person{"+"id=" + person_id + "name=" + name + ", patronymic=" + patronymic +", surname=" + surname +
+                ", age=" + age + ", gender=" + gender +'}';
+    }
+}
