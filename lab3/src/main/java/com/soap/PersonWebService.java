@@ -33,7 +33,8 @@ public class PersonWebService {
                 gender != null && !gender.trim().isEmpty()) {
 
             try {
-                int ageInt = Integer.parseInt(age.trim());;
+                int ageInt = Integer.parseInt(age.trim());
+                ;
 
                 if (gender.equals("мужской") ||
                         gender.equals("женский")) {
@@ -107,13 +108,10 @@ public class PersonWebService {
         try {
             int personIdInt = Integer.parseInt(person_id.trim());
 
-            Integer.parseInt(age.trim());
-
             List<String> updateArgs = new ArrayList<>();
 
             if (name != null && !name.trim().isEmpty()) updateArgs.add("name = '" + name + "'");
             if (surname != null && !surname.trim().isEmpty()) updateArgs.add("surname = '" + surname + "'");
-
             if (!age.trim().isEmpty()) {
                 try {
                     Integer.parseInt(age.trim());
@@ -125,7 +123,6 @@ public class PersonWebService {
                             ", при попытке преобразовать \"age\" в \"int\".", fault);
                 }
             }
-
 
             if (gender != null && !gender.trim().isEmpty()) {
                 if (gender.equals("мужской") ||

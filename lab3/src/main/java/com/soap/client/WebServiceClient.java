@@ -202,8 +202,6 @@ public class WebServiceClient {
         System.out.print("Введите пол: ");
         String gender = scanner.nextLine();
 
-        int age;
-
         // проверим ввод на наличие значений: строка не является пустой и не состоит из пробелов
         if ((name != null && !name.trim().isEmpty())  &&
                 (patronymic != null && !patronymic.trim().isEmpty())  &&
