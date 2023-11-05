@@ -132,7 +132,7 @@ public class PersonWebService {
                     FieldValueFault fault = FieldValueFault.defaultInstance();
                     throw new FieldValueException("В классе произошла ошибка:" + PersonWebService.class.getName() +
                             ",  метод - updatePerson(). \n Поле \"пол\" не содержит ни одного из " +
-                            "значение: 'мужчина' или 'женщина'.",
+                            "значение: 'мужской' или 'женский'.",
                             fault);
                 }
             }
