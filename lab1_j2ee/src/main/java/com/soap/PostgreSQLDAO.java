@@ -13,6 +13,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class PostgreSQLDAO {
+    Statement stmt = null;
+    ResultSet rs = null;
     private Connection connection;
      public PostgreSQLDAO(Connection connection) {
         this.connection = connection;
@@ -35,6 +37,21 @@ public class PostgreSQLDAO {
         } catch (SQLException ex) {
             Logger.getLogger(PostgreSQLDAO.class.getName()).log(Level.SEVERE,
                     null, ex);
+        }finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return persons;
     }
