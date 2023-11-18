@@ -147,7 +147,8 @@ public class WebServiceClient {
                             updateRowsMap.get("surname"),
                             updateRowsMap.get("age"),
                             updateRowsMap.get("gender"));
-                } catch (ForIntException | EmptyFieldException | FieldValueException | IdNotExistsException e) {
+                } catch (ForIntException | EmptyFieldException | FieldValueException | IdNotExistsException |
+                         ThrottlingException e) {
                     e.printStackTrace();
                 }
             } else {
@@ -167,7 +168,7 @@ public class WebServiceClient {
 
         try {
             status = personService.getPersonWebServicePort().deletePerson(personIDString);
-        } catch (NumberFormatException | ForIntException | IdNotExistsException ex) {
+        } catch (NumberFormatException | ForIntException | IdNotExistsException | ThrottlingException ex) {
             Logger.getLogger(WebServiceClient.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -177,10 +178,17 @@ public class WebServiceClient {
 
 
     private static void readPersonMethod(PersonServiceCRUD personService) {
-        List<Person> persons = personService.getPersonWebServicePort().getPersons();
-        for (Person person : persons) {
-            System.out.println("id: " + person.getPersonId() + " name: " + person.getName() + ", surname: " + person.getSurname() + ", age: " +
-                    person.getAge());
+        for (int i = 0; i < 100; i++) {
+            try {
+                System.out.println("Trying to get persons... Attempt: " + (i + 1));
+                List<Person> persons = personService.getPersonWebServicePort().getPersons();
+                for (Person person : persons) {
+                    System.out.println("id: " + person.getPersonId() + " name: " + person.getName() + ", surname: " +
+                            person.getSurname() + ", age: " + person.getAge());
+                }
+            } catch (ThrottlingException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -210,7 +218,7 @@ public class WebServiceClient {
                 (gender != null && !gender.trim().isEmpty())) {
             try {
                 status = personService.getPersonWebServicePort().createPerson(name, patronymic, surname, ageString, gender);
-            } catch (ForIntException | EmptyFieldException | FieldValueException e) {
+            } catch (ForIntException | EmptyFieldException | FieldValueException | ThrottlingException e) {
                 e.printStackTrace();
             }
             System.out.println("Status: " + status);

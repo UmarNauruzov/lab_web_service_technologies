@@ -30,13 +30,18 @@ public interface PersonWebService {
      * 
      * @return
      *     returns java.util.List<com.soap.client.Person>
+     * @throws ThrottlingException
      */
     @WebMethod
     @WebResult(targetNamespace = "")
     @RequestWrapper(localName = "getPersons", targetNamespace = "http://soap.com/", className = "com.soap.client.GetPersons")
     @ResponseWrapper(localName = "getPersonsResponse", targetNamespace = "http://soap.com/", className = "com.soap.client.GetPersonsResponse")
-    @Action(input = "http://soap.com/PersonWebService/getPersonsRequest", output = "http://soap.com/PersonWebService/getPersonsResponse")
-    public List<Person> getPersons();
+    @Action(input = "http://soap.com/PersonWebService/getPersonsRequest", output = "http://soap.com/PersonWebService/getPersonsResponse", fault = {
+        @FaultAction(className = ThrottlingException.class, value = "http://soap.com/PersonWebService/getPersons/Fault/ThrottlingException")
+    })
+    public List<Person> getPersons()
+        throws ThrottlingException
+    ;
 
     /**
      * 
@@ -47,9 +52,10 @@ public interface PersonWebService {
      * @param personPatronymic
      * @return
      *     returns java.lang.String
+     * @throws ThrottlingException
      * @throws ForIntException
-     * @throws EmptyFieldException
      * @throws FieldValueException
+     * @throws EmptyFieldException
      */
     @WebMethod
     @WebResult(targetNamespace = "")
@@ -58,7 +64,8 @@ public interface PersonWebService {
     @Action(input = "http://soap.com/PersonWebService/createPersonRequest", output = "http://soap.com/PersonWebService/createPersonResponse", fault = {
         @FaultAction(className = EmptyFieldException.class, value = "http://soap.com/PersonWebService/createPerson/Fault/EmptyFieldException"),
         @FaultAction(className = ForIntException.class, value = "http://soap.com/PersonWebService/createPerson/Fault/ForIntException"),
-        @FaultAction(className = FieldValueException.class, value = "http://soap.com/PersonWebService/createPerson/Fault/FieldValueException")
+        @FaultAction(className = FieldValueException.class, value = "http://soap.com/PersonWebService/createPerson/Fault/FieldValueException"),
+        @FaultAction(className = ThrottlingException.class, value = "http://soap.com/PersonWebService/createPerson/Fault/ThrottlingException")
     })
     public String createPerson(
         @WebParam(name = "personName", targetNamespace = "")
@@ -71,7 +78,7 @@ public interface PersonWebService {
         String personAge,
         @WebParam(name = "personGender", targetNamespace = "")
         String personGender)
-        throws EmptyFieldException, FieldValueException, ForIntException
+        throws EmptyFieldException, FieldValueException, ForIntException, ThrottlingException
     ;
 
     /**
@@ -79,6 +86,7 @@ public interface PersonWebService {
      * @param personId
      * @return
      *     returns java.lang.String
+     * @throws ThrottlingException
      * @throws ForIntException
      * @throws IdNotExistsException
      */
@@ -88,12 +96,13 @@ public interface PersonWebService {
     @ResponseWrapper(localName = "deletePersonResponse", targetNamespace = "http://soap.com/", className = "com.soap.client.DeletePersonResponse")
     @Action(input = "http://soap.com/PersonWebService/deletePersonRequest", output = "http://soap.com/PersonWebService/deletePersonResponse", fault = {
         @FaultAction(className = ForIntException.class, value = "http://soap.com/PersonWebService/deletePerson/Fault/ForIntException"),
-        @FaultAction(className = IdNotExistsException.class, value = "http://soap.com/PersonWebService/deletePerson/Fault/IdNotExistsException")
+        @FaultAction(className = IdNotExistsException.class, value = "http://soap.com/PersonWebService/deletePerson/Fault/IdNotExistsException"),
+        @FaultAction(className = ThrottlingException.class, value = "http://soap.com/PersonWebService/deletePerson/Fault/ThrottlingException")
     })
     public String deletePerson(
         @WebParam(name = "person_id", targetNamespace = "")
         String personId)
-        throws ForIntException, IdNotExistsException
+        throws ForIntException, IdNotExistsException, ThrottlingException
     ;
 
     /**
@@ -106,10 +115,11 @@ public interface PersonWebService {
      * @param personPatronymic
      * @return
      *     returns java.lang.String
-     * @throws ForIntException
      * @throws IdNotExistsException
-     * @throws EmptyFieldException
+     * @throws ThrottlingException
+     * @throws ForIntException
      * @throws FieldValueException
+     * @throws EmptyFieldException
      */
     @WebMethod
     @WebResult(targetNamespace = "")
@@ -119,7 +129,8 @@ public interface PersonWebService {
         @FaultAction(className = EmptyFieldException.class, value = "http://soap.com/PersonWebService/updatePerson/Fault/EmptyFieldException"),
         @FaultAction(className = ForIntException.class, value = "http://soap.com/PersonWebService/updatePerson/Fault/ForIntException"),
         @FaultAction(className = IdNotExistsException.class, value = "http://soap.com/PersonWebService/updatePerson/Fault/IdNotExistsException"),
-        @FaultAction(className = FieldValueException.class, value = "http://soap.com/PersonWebService/updatePerson/Fault/FieldValueException")
+        @FaultAction(className = FieldValueException.class, value = "http://soap.com/PersonWebService/updatePerson/Fault/FieldValueException"),
+        @FaultAction(className = ThrottlingException.class, value = "http://soap.com/PersonWebService/updatePerson/Fault/ThrottlingException")
     })
     public String updatePerson(
         @WebParam(name = "person_id", targetNamespace = "")
@@ -134,7 +145,7 @@ public interface PersonWebService {
         String personAge,
         @WebParam(name = "personGender", targetNamespace = "")
         String personGender)
-        throws EmptyFieldException, FieldValueException, ForIntException, IdNotExistsException
+        throws EmptyFieldException, FieldValueException, ForIntException, IdNotExistsException, ThrottlingException
     ;
 
 }

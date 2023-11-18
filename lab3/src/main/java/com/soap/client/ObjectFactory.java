@@ -28,6 +28,7 @@ public class ObjectFactory {
     private final static QName _FieldValueException_QNAME = new QName("http://soap.com/", "FieldValueException");
     private final static QName _ForIntException_QNAME = new QName("http://soap.com/", "ForIntException");
     private final static QName _IdNotExistsException_QNAME = new QName("http://soap.com/", "IdNotExistsException");
+    private final static QName _ThrottlingException_QNAME = new QName("http://soap.com/", "ThrottlingException");
     private final static QName _CreatePerson_QNAME = new QName("http://soap.com/", "createPerson");
     private final static QName _CreatePersonResponse_QNAME = new QName("http://soap.com/", "createPersonResponse");
     private final static QName _DeletePerson_QNAME = new QName("http://soap.com/", "deletePerson");
@@ -74,6 +75,14 @@ public class ObjectFactory {
      */
     public IdNotExistsFault createIdNotExistsFault() {
         return new IdNotExistsFault();
+    }
+
+    /**
+     * Create an instance of {@link ThrottlingFault }
+     * 
+     */
+    public ThrottlingFault createThrottlingFault() {
+        return new ThrottlingFault();
     }
 
     /**
@@ -198,6 +207,19 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://soap.com/", name = "IdNotExistsException")
     public JAXBElement<IdNotExistsFault> createIdNotExistsException(IdNotExistsFault value) {
         return new JAXBElement<IdNotExistsFault>(_IdNotExistsException_QNAME, IdNotExistsFault.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ThrottlingFault }{@code >}
+     * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link ThrottlingFault }{@code >}
+     */
+    @XmlElementDecl(namespace = "http://soap.com/", name = "ThrottlingException")
+    public JAXBElement<ThrottlingFault> createThrottlingException(ThrottlingFault value) {
+        return new JAXBElement<ThrottlingFault>(_ThrottlingException_QNAME, ThrottlingFault.class, null, value);
     }
 
     /**
