@@ -9,9 +9,12 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 public class PostgreSQLDAO {
+    Connection conn = null;
+    Statement stmt = null;
+    ResultSet rs = null;
     public List<Person> getPersons() {
         List<Person> persons = new ArrayList<>();
-        try (Connection connection = ConnectionUtil.getConnection()){
+        try (Connection connection = ConnectionUtil.getConnection()) {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery("select * from persons");
             while (rs.next()) {
@@ -26,6 +29,22 @@ public class PostgreSQLDAO {
         } catch (SQLException ex) {
             Logger.getLogger(PostgreSQLDAO.class.getName()).log(Level.SEVERE,
                     null, ex);
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) { /* Ignored */}
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) { /* Ignored */}
+            }
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) { /* Ignored */}
+            }
         }
         return persons;
     }
