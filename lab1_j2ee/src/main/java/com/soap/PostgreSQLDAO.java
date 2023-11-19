@@ -31,13 +31,13 @@ public class PostgreSQLDAO {
                 String surname = rs.getString("surname");
                 int age = rs.getInt("age");
                 String gender = rs.getString("gender");
-                Person picture = new Person(name, patronymic, surname, age, gender);
-                persons.add(picture);
+                Person person = new Person(name, patronymic, surname, age, gender);
+                persons.add(person);
             }
         } catch (SQLException ex) {
             Logger.getLogger(PostgreSQLDAO.class.getName()).log(Level.SEVERE,
                     null, ex);
-        }finally {
+        } finally {
             if (rs != null) {
                 try {
                     rs.close();
