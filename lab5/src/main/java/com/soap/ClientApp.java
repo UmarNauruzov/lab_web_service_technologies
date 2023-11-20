@@ -178,9 +178,9 @@ public class ClientApp {
 
                     WebResource webResource = client.resource(URL);
                     webResource = webResource.queryParam("id",
-                            PersonIDString).queryParam("PersonName", name).queryParam("personPatronymic",
+                            PersonIDString).queryParam("personName", name).queryParam("personPatronymic",
                             patronymic).queryParam("personSurname",
-                            surname).queryParam("personAge", age).queryParam("studentGender", gender);
+                            surname).queryParam("personAge", age).queryParam("personGender", gender);
                     ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).put(ClientResponse.class);
                     if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
                         throw new IllegalStateException("Запрос не выполнен");

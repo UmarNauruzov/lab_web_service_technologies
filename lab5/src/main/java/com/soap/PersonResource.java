@@ -38,12 +38,12 @@ public class PersonResource {
     }
 
     @DELETE
-    public String deleteStudent(@QueryParam("id") String person_id) {
+    public String deletePerson(@QueryParam("id") String person_id) {
         return new PostgreSQLDAO().deletePerson(Integer.parseInt(person_id));
     }
 
     @PUT
-    public String updateStudent(
+    public String updatePerson(
             @QueryParam("id") String person_id,
             @QueryParam("personName") String name,
             @QueryParam("personPatronymic") String patronymic,
