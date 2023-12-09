@@ -12,10 +12,16 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
+import org.postgresql.util.Base64;
 
 public class ClientApp {
     private static final String URL = "http://localhost:8080/restCRUD/persons";
+    private static final String USERNAME = "admin";
+    private static final String PASSWORD = "admin";
+
     public static void main(String[] args) {
+
+
         Client client = Client.create();
 
             // Выбор метода CRUD
@@ -62,6 +68,7 @@ public class ClientApp {
     }
 
     private static void updatePerson(Client client) {
+        String authToken = "Basic " + Base64.encodeBytes((USERNAME + ":" + PASSWORD).getBytes());
         // Консольный ввод аргументов
         Scanner scanner = new Scanner(System.in);
 
@@ -181,7 +188,10 @@ public class ClientApp {
                             PersonIDString).queryParam("personName", name).queryParam("personPatronymic",
                             patronymic).queryParam("personSurname",
                             surname).queryParam("personAge", age).queryParam("personGender", gender);
-                    ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).put(ClientResponse.class);
+                    // Добавляем заголовок авторизации
+                    ClientResponse response = webResource.header("Authorization", authToken)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .put(ClientResponse.class);
                     if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
                         throw new IllegalStateException("Запрос не выполнен");
                     }
@@ -197,6 +207,7 @@ public class ClientApp {
 
 
     private static void deletePerson(Client client) {
+        String authToken = "Basic " + Base64.encodeBytes((USERNAME + ":" + PASSWORD).getBytes());
         // Консольный ввод аргументов
         Scanner scanner = new Scanner(System.in);
 
@@ -207,7 +218,10 @@ public class ClientApp {
             Integer.parseInt(personId.trim());
             WebResource webResource = client.resource(URL);
             webResource = webResource.queryParam("id", personId);
-            ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).delete(ClientResponse.class);
+            // Добавляем заголовок авторизации
+            ClientResponse response = webResource.header("Authorization", authToken)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .delete(ClientResponse.class);
             if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
                 throw new IllegalStateException("Запрос не выполнен");
             }
@@ -266,6 +280,7 @@ public class ClientApp {
     }
 
     private static void createPerson(Client client) {
+        String authToken = "Basic " + Base64.encodeBytes((USERNAME + ":" + PASSWORD).getBytes());
         // Консольный ввод аргументов
         Scanner scanner = new Scanner(System.in);
 
@@ -294,8 +309,11 @@ public class ClientApp {
 
                 webResource = webResource.queryParam("personName", name).queryParam("personPatronymic",
                         patronymic).queryParam("personSurname", surname).queryParam("personAge", ageString).queryParam("personGender", gender);
+                // Добавляем заголовок авторизации
+                ClientResponse response = webResource.header("Authorization", authToken)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .post(ClientResponse.class);
 
-                ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).post(ClientResponse.class);
                 if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
                     throw new IllegalStateException("Запрос не выполнен");
                 }
