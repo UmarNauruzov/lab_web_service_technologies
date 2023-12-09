@@ -6,9 +6,17 @@ import java.net.URL;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.postgresql.util.Base64;
+
+import javax.xml.ws.BindingProvider;
+import javax.xml.ws.handler.MessageContext;
+
 
 public class WebServiceClient {
-    public static void main(String[] args) throws MalformedURLException {
+
+    private static final String USERNAME = "admin";
+    private static final String PASSWORD = "admin";
+    public static void main(String[] args) throws MalformedURLException, AuthException {
         URL url = new URL("http://localhost:8080/PersonServiceCRUD?wsdl");
         PersonServiceCRUD personService = new PersonServiceCRUD(url);
 
@@ -52,8 +60,9 @@ public class WebServiceClient {
         scanner.close();
     }
 
-    private static void updatePersonMethod(PersonServiceCRUD personService) {
-
+    private static void updatePersonMethod(PersonServiceCRUD personService) throws AuthException {
+        String authToken = getAuthToken();
+        System.out.println(authToken);
         String status = "Bad";
 
         // Консольный ввод аргументов
@@ -176,6 +185,11 @@ public class WebServiceClient {
                 System.out.println("Вы действительно хотите изменить эти поля для строки " + personId + "? (y -> yes, other -> no)");
                 String agree = scanner.nextLine();
                 if (agree.equals("y")) {
+                    // Добавление заголовка Authorization
+                    Map<String, List<String>> requestHeaders = new HashMap<>();
+                    requestHeaders.put("Authorization", Collections.singletonList(authToken));
+                    ((BindingProvider) personService.getPersonWebServicePort()).getRequestContext().put(MessageContext.HTTP_REQUEST_HEADERS, requestHeaders);
+
                     String name = updateRowsMap.get("name");
                     String patronymic = updateRowsMap.get("patronymic");
                     String surname = updateRowsMap.get("surname");
@@ -200,6 +214,8 @@ public class WebServiceClient {
 
 
     private static void deletePersonMethod(PersonServiceCRUD personService) {
+        String authToken = getAuthToken();
+        System.out.println(authToken);
         String status = "Bad";
 
         // Консольный ввод аргументов
@@ -208,13 +224,22 @@ public class WebServiceClient {
         System.out.print("Введите идентификатор пользователя (целое число): ");
         String personIDString = scanner.nextLine();
 
+
         try {
             int personId = Integer.parseInt(personIDString.trim());
+            // Добавление заголовка Authorization
+            Map<String, List<String>> requestHeaders = new HashMap<>();
+            requestHeaders.put("Authorization", Collections.singletonList(authToken));
+            ((BindingProvider) personService.getPersonWebServicePort()).getRequestContext().put(MessageContext.HTTP_REQUEST_HEADERS, requestHeaders);
+
             status = personService.getPersonWebServicePort().deletePerson(personId);
+
             if (status.equals("1")) status = "Good";
             System.out.println("Status: " + status);
         } catch (NumberFormatException ex) {
             System.out.println("Неверное значение personId! Введите только одно целое число..");
+        } catch (AuthException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -228,6 +253,7 @@ public class WebServiceClient {
     }
 
     private static void createPersonMethod(PersonServiceCRUD personService) {
+        String authToken = getAuthToken();
 
         String status = "Bad";
 
@@ -253,6 +279,11 @@ public class WebServiceClient {
                 (surname != null && !surname.trim().isEmpty()) &&
                 (ageString != null && !ageString.trim().isEmpty()) &&
                 (gender != null && !gender.trim().isEmpty())) {
+            // Добавление заголовка Authorization
+            Map<String, List<String>> requestHeaders = new HashMap<>();
+            requestHeaders.put("Authorization", Collections.singletonList(authToken));
+            ((BindingProvider) personService.getPersonWebServicePort()).getRequestContext().put(MessageContext.HTTP_REQUEST_HEADERS, requestHeaders);
+
             try {
                 age = Integer.parseInt(ageString.trim());
                 status = personService.getPersonWebServicePort().createPerson(name, patronymic, surname, age, gender);
@@ -260,10 +291,15 @@ public class WebServiceClient {
                 System.out.println("Status: " + status);
             } catch (NumberFormatException ex) {
                 System.out.println("Неверный возраст!");
+            } catch (AuthException e) {
+                throw new RuntimeException(e);
             }
         }
         else {
             System.out.println("Ваш запрос неверен!");
         }
+    }
+    private static String getAuthToken() {
+        return "Basic " + Base64.encodeBytes((USERNAME + ":" + PASSWORD).getBytes());
     }
 }
