@@ -1,5 +1,6 @@
 package com.soap;
 
+import com.soap.client.WebServiceClient;
 import org.apache.juddi.api_v3.AccessPointType;
 import org.apache.juddi.v3.client.UDDIConstants;
 import org.apache.juddi.v3.client.config.UDDIClient;
@@ -22,69 +23,69 @@ public class JUDDIApp {
 
     public static void main(String[] args) {
 
-        // Get data from console in
+        // Получить данные из консоли
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Please, input your jUDDI admin username (default: uddiadmin)?");
+        System.out.println("Пожалуйста, введите свое имя пользователя администратора uddi (default: uddiadmin)?");
         String userName = scanner.nextLine();
         if (userName.trim().isEmpty()) {
             userName = "uddiadmin";
         }
-        System.out.println("Please, input your jUDDI admin password (default: da_password1)?");
+        System.out.println("Пожалуйста, введите свой пароль администратора jUDDI (default: da_password1)?");
         String userPass = scanner.nextLine();
         if (userPass.trim().isEmpty()) {
             userPass = "da_password1";
         }
 
-        // Create UDDIClient and proxy to config, add references to UDDI API
+        // Создайте UDDI-клиент и прокси-сервер для настройки, добавьте ссылки на UDDI API
         JUDDIApp app = new JUDDIApp();
-        // Get Auth token as String
+        // Получить токен аутентификации в виде строки
         String token = app.getUDDIToken(userName, userPass);
 
-        // Register new service (for jUDDI v.3.0 and higher)
-        System.out.println("Do you want to register a new Business/Service? (y -> yes, other -> no)");
+        // Зарегистрируйте новую услугу (для jUDDI версии 3.0 и выше)
+        System.out.println("Вы хотите зарегистрировать новый бизнес/услугу? (y -> yes, other -> no)");
         String agree = scanner.nextLine();
         if (agree.equals("y")) {
 
-            System.out.println("What jUDDI Business Name will we use (default: Custom Business)?");
+            System.out.println("Какое фирменное наименование jUDDI мы будем использовать (default: CRUDCompane)?");
             String businessName = scanner.nextLine();
             if (businessName.trim().isEmpty()) {
-                businessName = "Custom Business";
+                businessName = "CRUDCompane";
             }
 
-            System.out.println("What jUDDI Service Name will we use (default: CRUDService)?");
+            System.out.println("Какое имя службы jUDDI мы будем использовать (default: CRUDService)?");
             String registeredServiceName = scanner.nextLine();
             if (registeredServiceName.trim().isEmpty()) {
                 registeredServiceName = "CRUDService";
             }
 
-            System.out.println("What jUDDI Service Access Point (default: http://localhost:8090/CRUDService?wsdl)?");
+            System.out.println("Какая точка доступа к сервису jUDDI (default: http://localhost:8090/PersonServiceCRUD?wsdl)?");
             String registeredServiceURL = scanner.nextLine();
             if (registeredServiceURL.trim().isEmpty()) {
-                registeredServiceURL = "http://localhost:8090/CRUDService?wsdl";
+                registeredServiceURL = "http://localhost:8090/PersonServiceCRUD?wsdl";
             }
             app.registerNewService(token, businessName, registeredServiceName, registeredServiceURL);
         }
 
-        System.out.println("Do you want to search and request some Service? (y -> yes, other -> no)");
+        System.out.println("Вы хотите выполнить поиск и запросить какой-нибудь сервис? (y -> yes, other -> no)");
         agree = scanner.nextLine();
         if (agree.equals("y")) {
 
-            System.out.println("What jUDDI Service Name will we search (default: CRUDService)?");
+            System.out.println("Какое название сервиса jUDDI мы будем искать (default: CRUDService)?");
             String searchServiceName = scanner.nextLine();
             if (searchServiceName.trim().isEmpty()) {
                 searchServiceName = "CRUDService";
             }
 
-            // Search service
+            // Поиск сервиса
             String accessPoint;
             try {
                 accessPoint = app.searchService(app.GetBusinessList(inquiry, token).getBusinessInfos(), inquiry, token, searchServiceName);
-                System.out.println("Do you want to request this service now? (y -> yes, other -> no)");
+                System.out.println("Вы хотите запросить этот сервис прямо сейчас? (y -> yes, other -> no)");
                 agree = scanner.nextLine();
                 if (agree.equals("y")) {
                     WebServiceClient serviceClient = new WebServiceClient();
-                    serviceClient.serviceRequest(accessPoint);
+                    serviceClient.serviceCRUD(accessPoint);
                 }
             } catch (Exception ex) {
                 Logger.getLogger(JUDDIApp.class.getName()).log(Level.SEVERE, null, ex);
@@ -105,13 +106,13 @@ public class JUDDIApp {
 
     public JUDDIApp() {
         try {
-            // create UDDIClient and proxy to config
+            // создаем UDDI-клиент и прокси-сервер для настройки
             UDDIClient client = new UDDIClient("META-INF/service_search.xml");
-            // a UDDIClient can be a client to multiple UDDI nodes, so
-            // supply the nodeName defined in service_search.xml.
-            // The transport also is defined in the service_search.xml.
+            // Клиент UDDI может быть клиентом нескольких узлов UDDI, поэтому
+            // укажите имя узла, определенное в service_search.xml.
+            // Транспортировка также определена в service_search.xml.
             Transport transport = client.getTransport("default");
-            // Now, create a reference to the UDDI API
+            // Теперь создаем ссылку на UDDI API
             security = transport.getUDDISecurityService();
             inquiry = transport.getUDDIInquiryService();
             publish = transport.getUDDIPublishService();
@@ -123,11 +124,11 @@ public class JUDDIApp {
 
     private String getUDDIToken(String jUDDIUserName, String jUDDIUSerPass) {
         String token = null;
-        // Get auth token (appends credentials to the ws proxies)
+        // Получить токен аутентификации (добавляет учетные данные к прокси-серверам ws)
         GetAuthToken getAuthToken = new GetAuthToken();
         getAuthToken.setUserID(jUDDIUserName);
         getAuthToken.setCred(jUDDIUSerPass);
-        // Making API call that retrieves the authentication token for the user.
+        // Выполнение вызова API, который извлекает токен аутентификации для пользователя.
         try {
             AuthToken authToken = security.getAuthToken(getAuthToken);
             token =  authToken.getAuthInfo();
@@ -138,22 +139,22 @@ public class JUDDIApp {
     }
 
     /**
-     * Register New Service in jUDDI from WSDL
-     * based on access control rules
+     * Зарегистрируем новый сервис в jUDDI с помощью WSDL
+     * на основе правил контроля доступа
      */
     private void registerNewService(
             String token,
             String businessName,
             String registeredServiceName,
             String registeredServiceURL) {
-        // Creating the parent business entity that will contain our service.
+        // Создание родительского бизнес-объекта, который будет содержать наш сервис.
         BusinessEntity myBusEntity = new BusinessEntity();
         Name myBusName = new Name();
         myBusName.setValue(businessName);
         myBusEntity.getName().add(myBusName);
 
-        // Adding the business entity to the "save" structure, using our
-        // publisher's authentication info and saving away.
+        // Добавление бизнес-объекта в структуру "сохранить", используя наш
+        // аутентификационную информацию издателя и сохраняем ее.
         SaveBusiness sb = new SaveBusiness();
         sb.getBusinessEntity().add(myBusEntity);
         sb.setAuthInfo(token);
@@ -161,34 +162,33 @@ public class JUDDIApp {
         try {
             BusinessDetail bd = publish.saveBusiness(sb);
             String myBusKey = bd.getBusinessEntity().get(0).getBusinessKey();
-//            System.out.println("myBusiness key:  " + myBusKey);
 
-            // Creating a service to save.
-            // Only adding the minimum data: the parent business key retrieved
-            // from saving the business
-            // above and a single name.
+            // Создаем службу для сохранения.
+            // Только добавление минимальных данных: извлечен родительский бизнес-ключ
+            // от спасения бизнеса
+            // выше и одно-единственное имя.
             BusinessService myService = new BusinessService();
             myService.setBusinessKey(myBusKey);
             Name myServName = new Name();
             myServName.setValue(registeredServiceName);
             myService.getName().add(myServName);
 
-            // Add binding templates, etc...
+            // Добавляйем шаблоны привязки и т.д..
             BindingTemplate myBindingTemplate = new BindingTemplate();
             AccessPoint accessPoint = new AccessPoint();
             accessPoint.setUseType(AccessPointType.WSDL_DEPLOYMENT.toString());
             accessPoint.setValue(registeredServiceURL);
             myBindingTemplate.setAccessPoint(accessPoint);
             BindingTemplates myBindingTemplates = new BindingTemplates();
-            // optional but recommended step, this annotations our binding with all
-            // the standard SOAP tModel instance infos
+            // необязательный, но рекомендуемый шаг, это аннотирует нашу привязку ко всем
+            // стандартная информация об экземпляре SOAP tModel
             myBindingTemplate = UDDIClient.addSOAPtModels(myBindingTemplate);
             myBindingTemplates.getBindingTemplate().add(myBindingTemplate);
 
             myService.setBindingTemplates(myBindingTemplates);
 
-            // Adding the service to the "save" structure, using our publisher's
-            // authentication info and saving away.
+            // Добавление сервиса в структуру "сохранить" с помощью нашего издателя
+            // аутентификационная информация и ее сохранение.
             SaveService ss = new SaveService();
             ss.getBusinessService().add(myService);
             ss.setAuthInfo(token);
@@ -196,8 +196,7 @@ public class JUDDIApp {
             String myServKey = sd.getBusinessService().get(0).getServiceKey();
             System.out.println("myService key:  " + myServKey);
 
-            // Now you have published a business and service via
-            // the jUDDI API!
+            // Теперь вы опубликовали бизнес и услугу с помощью jUDDI API!
             System.out.println("New service successfully registered!");
 
         } catch (RemoteException ex) {
@@ -207,8 +206,8 @@ public class JUDDIApp {
     }
 
     /**
-     * Find all of the registered businesses. This list may be filtered
-     * based on access control rules
+     * Находим все зарегистрированные предприятия. Этот список можно отфильтровать
+     * на основе правил контроля доступа
      */
     private BusinessList GetBusinessList(
             UDDIInquiryPortType inquiry,
@@ -227,7 +226,7 @@ public class JUDDIApp {
     }
 
     /**
-     * Find registered service with some name.
+     * Находим зарегистрированный сервис с каким-нибудь названием.
      */
     private String searchService(
             BusinessInfos businessInfos,
@@ -250,13 +249,13 @@ public class JUDDIApp {
                     BusinessService get = serviceDetail.getBusinessService().get(k);
 
                     if (ListToString(get.getName()).equals(serviceName)) {
-                        System.out.println("Fetching Service Access Point for Business " + businessInfos.getBusinessInfo().get(i).getBusinessKey());
-                        System.out.println("We find this service in jUDDI register!");
+                        System.out.println("Точка доступа к сервису выборки для бизнеса " + businessInfos.getBusinessInfo().get(i).getBusinessKey());
+                        System.out.println("Мы находим эту услугу в jUDDI register!");
                         return  getServiceAccessPoint(get.getBindingTemplates());
                     }
                 }
             } catch (NullPointerException ex) {
-                System.out.println("That's it! We get a " + ex);
+                System.out.println("Вот и все! Мы получаем " + ex);
                 return null;
             }
         }
@@ -264,7 +263,7 @@ public class JUDDIApp {
     }
 
     /**
-     * This function is translating UDDI's complex data format to String with Service Access Point
+     * Эта функция преобразует сложный формат данных UDDI в строку с точкой доступа к сервису
      */
     private String getServiceAccessPoint(BindingTemplates bindingTemplates) {
         if (bindingTemplates == null) {
@@ -284,7 +283,7 @@ public class JUDDIApp {
     }
 
     /**
-     * This function is translating List data to String
+     * Эта функция преобразует данные списка в строку
      */
     private String ListToString(List<Name> name) {
         StringBuilder sb = new StringBuilder();
